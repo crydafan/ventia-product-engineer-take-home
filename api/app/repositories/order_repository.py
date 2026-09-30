@@ -29,5 +29,10 @@ class OrderRepository:
         db.refresh(order)
         return order
 
+    def stage(self, db: Session, order: Order) -> Order:
+        db.add(order)
+        db.flush()
+        return order
+
 
 order_repository = OrderRepository()
