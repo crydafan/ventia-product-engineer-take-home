@@ -1,0 +1,1 @@
+{"name":"ventia-product-engineer-starter","private":true,"scripts":{"dev":"pnpm --filter web dev","build":"pnpm --filter web build","typecheck":"pnpm --filter web typecheck"},"packageManager":"pnpm@9.0.0"}

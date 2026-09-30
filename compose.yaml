@@ -1,0 +1,90 @@
+name: ${COMPOSE_PROJECT_NAME:-ventia-challenge}
+
+x-web-environment: &web-env
+  AUTH_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+  BETTER_AUTH_URL: ${BETTER_AUTH_URL}
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+  SEED_EMAIL: ${SEED_EMAIL}
+  SEED_PASSWORD: ${SEED_PASSWORD}
+  NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "127.0.0.1:${DB_PORT:-55432}:5432"
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  auth-init:
+    build: { context: ., dockerfile: web/Dockerfile }
+    environment: *web-env
+    command: ["pnpm", "init:auth"]
+    depends_on:
+      db: { condition: service_healthy }
+
+  api:
+    build: { context: api }
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      AUTH_ISSUER: ${BETTER_AUTH_URL}
+      AUTH_AUDIENCE: ventia-challenge-api
+      AUTH_JWKS_URL: http://web:3000/api/auth/jwks
+      WEB_ORIGIN: ${BETTER_AUTH_URL}
+      SEED_EMAIL: ${SEED_EMAIL}
+      SEED_FILE: /data/seed.json
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      MODEL_PROVIDER: ${MODEL_PROVIDER:-}
+      MODEL_NAME: ${MODEL_NAME:-}
+    command: ["sh", "-c", "uv run --frozen alembic upgrade head && uv run --frozen python -m scripts.seed && exec uv run --frozen uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+    ports:
+      - "127.0.0.1:${API_PORT:-8100}:8000"
+    volumes:
+      - ./api:/app
+      - ./data:/data:ro
+    depends_on:
+      auth-init: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 3s
+      timeout: 4s
+      retries: 30
+
+  web:
+    build: { context: ., dockerfile: web/Dockerfile }
+    command: ["sh", "-c", "pnpm install --frozen-lockfile && exec pnpm dev --hostname 0.0.0.0"]
+    environment:
+      <<: *web-env
+      npm_config_store_dir: /root/.local/share/pnpm/store
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3100}:3000"
+    volumes:
+      - ./:/workspace
+      - web_root_modules:/workspace/node_modules
+      - web_modules:/workspace/web/node_modules
+      - web_store:/root/.local/share/pnpm/store
+      - web_next:/workspace/web/.next
+    depends_on:
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  database:
+  web_root_modules:
+  web_modules:
+  web_store:
+  web_next:

@@ -1,0 +1,19 @@
+@import "tailwindcss";
+:root {
+  --volt: oklch(0.58 0.19 260);
+  --aqua: oklch(0.78 0.11 220);
+  --marino: oklch(0.33 0.10 255);
+  --cielo: oklch(0.93 0.04 230);
+  --noche: oklch(0.20 0.03 250);
+}
+@theme inline {
+  --color-volt: var(--volt);
+  --color-aqua: var(--aqua);
+  --color-marino: var(--marino);
+  --color-cielo: var(--cielo);
+  --color-noche: var(--noche);
+}
+body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--noche); background: white; }
+button { cursor: pointer; }
+button:disabled { cursor: wait; opacity: .6; }
+:focus-visible { outline: 2px solid var(--volt); outline-offset: 3px; }

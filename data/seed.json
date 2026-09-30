@@ -1,0 +1,22 @@
+{
+  "products": [
+    {"id":"polo-negro-m","name":"Polo negro, talla M","price_cents":4000,"currency":"PEN"},
+    {"id":"polo-blanco-m","name":"Polo blanco, talla M","price_cents":4000,"currency":"PEN"},
+    {"id":"polo-negro-l","name":"Polo negro, talla L","price_cents":4000,"currency":"PEN"},
+    {"id":"gorra-azul","name":"Gorra azul, talla única","price_cents":3000,"currency":"PEN"}
+  ],
+  "customers": [
+    {"id":"lucia-ramos","name":"Lucía Ramos"},
+    {"id":"diego-soto","name":"Diego Soto"},
+    {"id":"andrea-perez","name":"Andrea Pérez"}
+  ],
+  "conversations": [
+    {"id":"clear","customer_name":"Lucía Ramos","title":"Pedido claro","text":"Cliente: Hola, soy Lucía Ramos. Quiero dos polos negros talla M.\nCliente: Envíalos a Av. Los Olivos 123, departamento 402, Lima.\nVentas: El envío es gratuito."},
+    {"id":"correction","customer_name":"Diego Soto","title":"Cambio de opinión","text":"Cliente: Soy Diego Soto. Quiero dos polos negros talla M.\nCliente: Perdón, mejor uno negro y uno blanco, ambos talla M.\nCliente: La dirección es Calle Las Flores 456, casa 2, Lima.\nVentas: El envío es gratuito."},
+    {"id":"missing","customer_name":"Andrea Pérez","title":"Información incompleta","text":"Cliente: Soy Andrea Pérez. Quiero un polo negro.\nCliente: Envíalo a la dirección de la vez pasada.\nVentas: El envío es gratuito."}
+  ],
+  "orders": [
+    {"id":"00000000-0000-4000-8000-000000000001","customer_name":"Cliente Demo Uno","delivery_address":"Calle Demo 10, Lima","items":[{"product_id":"gorra-azul","quantity":1}]},
+    {"id":"00000000-0000-4000-8000-000000000002","customer_name":"Cliente Demo Dos","delivery_address":"Calle Demo 20, Lima","items":[{"product_id":"polo-negro-l","quantity":1}]}
+  ]
+}
