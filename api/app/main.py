@@ -14,7 +14,7 @@ app = FastAPI(title="VentIA Challenge")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[settings.web_origin],
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PUT"],
     allow_headers=["Authorization", "Content-Type"],
 )
 app.include_router(router)

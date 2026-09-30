@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     web_origin: str = "http://localhost:3100"
     seed_email: str = "candidato@ventia.test"
     seed_file: str = "../data/seed.json"
+    openai_api_key: str | None = None
+    model_name: str = ""
 
 
 settings = Settings()

@@ -153,4 +153,9 @@ El servidor toma precios del catálogo y devuelve `id`, `number`, `created_at`, 
 
 ## Mis decisiones
 
-Al entregar, completa esta sección con el proveedor y modelo elegidos, SDK/framework, decisiones de producto y técnicas, verificaciones realizadas, limitaciones y un ejemplo concreto de código generado por tu asistente que revisaste o corregiste.
+- **Proveedor e integración:** OpenAI mediante el SDK de Python en FastAPI. El identificador del modelo se configura con `MODEL_NAME`; `OPENAI_API_KEY` permanece en el servidor.
+- **Borradores:** PostgreSQL, un borrador por usuario y conversación. Las propuestas y ediciones se guardan sin crear un pedido; el backend calcula los precios del pedido desde el catálogo.
+- **Control y recuperación:** regenerar requiere confirmación; las ediciones se guardan con debounce; crear el pedido es una acción explícita y el backend guarda el pedido y elimina el borrador en una transacción. Un borrador de una conversación cuyo texto cambió requiere reconocer el aviso antes de crear el pedido.
+- **Verificaciones de esta sesión:** no se ejecutaron pruebas, lint, typecheck, build, migraciones, recorrido en navegador ni generación real con OpenAI. Las credenciales y el modelo disponible deben comprobarse en el entorno de ejecución.
+- **Limitaciones:** el resultado del modelo no se verificó con una clave real y el identificador concreto queda en `MODEL_NAME`.
+- **Ejemplo revisado:** pendiente de una generación real. Para verificarlo, usa la conversación de Diego y confirma que la propuesta conserve la corrección final: un polo negro y uno blanco, ambos talla M.
