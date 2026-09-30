@@ -153,9 +153,26 @@ El servidor toma precios del catálogo y devuelve `id`, `number`, `created_at`, 
 
 ## Mis decisiones
 
-- **Proveedor e integración:** OpenAI mediante el SDK de Python en FastAPI. El identificador del modelo se configura con `MODEL_NAME`; `OPENAI_API_KEY` permanece en el servidor.
-- **Borradores:** PostgreSQL, un borrador por usuario y conversación. Las propuestas y ediciones se guardan sin crear un pedido; el backend calcula los precios del pedido desde el catálogo.
-- **Control y recuperación:** regenerar requiere confirmación; las ediciones se guardan con debounce; crear el pedido es una acción explícita y el backend guarda el pedido y elimina el borrador en una transacción. Un borrador de una conversación cuyo texto cambió requiere reconocer el aviso antes de crear el pedido.
-- **Verificaciones de esta sesión:** no se ejecutaron pruebas, lint, typecheck, build, migraciones, recorrido en navegador ni generación real con OpenAI. Las credenciales y el modelo disponible deben comprobarse en el entorno de ejecución.
-- **Limitaciones:** el resultado del modelo no se verificó con una clave real y el identificador concreto queda en `MODEL_NAME`.
-- **Ejemplo revisado:** pendiente de una generación real. Para verificarlo, usa la conversación de Diego y confirma que la propuesta conserve la corrección final: un polo negro y uno blanco, ambos talla M.
+### Uso de Codex
+
+Usé Codex en la aplicación y su terminal para recorrer la arquitectura, aclarar el alcance del flujo de conversación a pedido, redactar el PRD y preparar un plan de implementación. También delegué revisiones independientes de la arquitectura y del plan a subagentes de Codex. La implementación de la propuesta con IA no figura como terminada en las conversaciones revisadas.
+
+### Proveedor, modelo e integración de IA
+
+El proveedor y modelo que estoy usando para generar propuestas son OpenAI y `gpt-5-mini`. La integración del lado servidor está planteada en FastAPI con el SDK oficial; la configuración correspondiente es `MODEL_PROVIDER=openai` y `MODEL_NAME=gpt-5-mini`. La selección del modelo no implica que el recorrido completo desde la interfaz hasta la creación del pedido esté verificado.
+
+### Decisiones y comprobaciones
+
+El plan propone guardar borradores por conversación en PostgreSQL, generar propuestas desde FastAPI, guardar los cambios con autosave y finalizar el pedido de forma atómica. La revisión se presenta en un panel adaptable. Son decisiones de planificación; su implementación y recorrido completo aún no están verificados.
+
+Durante la preparación, Codex inspeccionó las rutas y límites entre Next.js, FastAPI, autenticación y persistencia, y documentó el mapa de arquitectura. También corrigió el arranque de Docker: después de que el build recibiera `denied` al descargar `uv` desde GHCR, cambió la imagen para instalar `uv==0.11.4` desde el índice de paquetes de Python. `docker compose up --build -d` terminó correctamente y las comprobaciones de salud de web y API devolvieron `200` desde sus contenedores. `git diff --check` también pasó. La petición `curl` desde el host no pudo conectar a los puertos publicados en ese entorno; la comprobación dentro de los contenedores sí pasó.
+
+### Limitaciones y ejemplo revisado
+
+No se ha verificado el recorrido visual de extremo a extremo para generar una propuesta y crear un pedido. El ejemplo concreto de código generado y revisado fue la línea de instalación fijada en `api/Dockerfile`:
+
+```dockerfile
+RUN pip install --no-cache-dir uv==0.11.4
+```
+
+La versión quedó fijada para conservar la reproducibilidad y evitar la descarga de GHCR que fallaba. El build de Docker y la salud de los servicios se comprobaron después del cambio.
