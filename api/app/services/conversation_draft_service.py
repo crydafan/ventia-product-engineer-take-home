@@ -8,6 +8,8 @@ from app.repositories.conversation_draft_repository import conversation_draft_re
 from app.repositories.order_repository import order_repository
 from app.schemas.conversation_draft import (
     ConversationDraft as ConversationDraftSchema,
+)
+from app.schemas.conversation_draft import (
     ConversationDraftResponse,
     DraftEdit,
     ProposalOutput,
@@ -65,7 +67,7 @@ class ConversationDraftService:
         products = db.scalars(select(Product.id).where(Product.id.in_(ids))).all() if ids else []
         unknown = ids - set(products)
         if unknown:
-            raise InvalidDraftItem(sorted(unknown)[0])
+            raise InvalidDraftItem(min(unknown))
         return payload.model_dump(mode="json")
 
     def save(
